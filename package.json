@@ -9,9 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "next": "14.1.4",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.1.4"
+    "react-simple-keyboard": "^3.7.101",
+    "simple-keyboard": "^3.7.70"
   },
   "devDependencies": {
     "typescript": "^5",
