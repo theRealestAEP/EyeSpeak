@@ -17,53 +17,59 @@ export default function Home() {
 
   return (
     <main className="h-screen flex">
-      {/* Left Section: Text input, buttons, and keyboard */}
-      <div className="flex flex-col w-3/4">
-        {/* Top Left: Text input and buttons */}
-        <div className="p-4 space-y-4">
-          <input
-            className="w-full p-2 border rounded mb-4 custom-textbox-height"
+    {/* Left Section: Text input, buttons, and keyboard */}
+    <div className="flex flex-col w-3/4">
+      {/* Top Left: Text input and buttons */}
+      <div className="p-4 space-y-4">
+        {/* Text input */}
+        <div className="text-input-container">
+          <textarea
+            className="text-input"
             value={input}
-            placeholder="Type here..."
+            placeholder="This is what a"
             onChange={onChangeInput}
           />
-          {/* Predict and Control buttons */}
-          <div className="flex justify-between">
-            <div className="flex space-x-2">
-              {/* Predict buttons */}
-              <button className="bg-purple-600 text-white py-2 px-4 rounded">Predict 1</button>
-              <button className="bg-purple-600 text-white py-2 px-4 rounded">Predict 2</button>
-              <button className="bg-purple-600 text-white py-2 px-4 rounded">Predict 3</button>
-            </div>
-            <div className="flex space-x-2">
-              {/* Play/Pause/Clear buttons */}
-              <button className="bg-green-500 text-white py-2 px-4 rounded">Play</button>
-              <button className="bg-yellow-400 text-white py-2 px-4 rounded">Pause</button>
-              <button className="bg-red-500 text-white py-2 px-4 rounded">Clear All</button>
-            </div>
+        </div>
+        {/* Predict and Control buttons */}
+        <div className="button-container">
+          {/* Predict buttons */}
+          <div className="predict-buttons">
+            <button className="button predict">Predict 1</button>
+            <button className="button predict">Predict 2</button>
+            <button className="button predict">Predict 3</button>
+          </div>
+          {/* Play/Pause/Clear buttons */}
+          <div className="control-buttons">
+            <button className="button play">Play</button>
+            <button className="button pause">Pause</button>
+            <button className="button clear">Clear All</button>
+            <button className="button delete">Delete Word</button>
+            <button className="button share">Share</button>
+            <button className="button generate">Generate Audio</button>
           </div>
         </div>
-        {/* Bottom Left: Keyboard */}
-        <div className="p-5">
-          <KeyboardWrapper
-
-            keyboardRef={keyboard}
-            onChange={setInput}
-          />
-        </div>
       </div>
-      {/* Right Section: Past messages and common phrases */}
-      <div className="w-1/4 bg-gray-100 p-4 space-y-4 overflow-auto">
-        <div>
-          <h2 className="font-bold mb-2">Past Messages</h2>
-          {/* Container for past messages */}
-        </div>
-        <div>
-          <h2 className="font-bold mb-2">Common Phrases</h2>
-          {/* Container for common phrases */}
-        </div>
+      {/* Bottom Left: Keyboard */}
+      <div className="keyboard-wrapper">
+        <KeyboardWrapper
+          keyboardRef={keyboard}
+          onChange={setInput}
+        />
       </div>
-    </main>
+    </div>
+    {/* Right Section: Past messages and common phrases */}
+    <div className="right-section">
+      <div>
+        <h2 className="title">Past Messages</h2>
+        {/* Container for past messages */}
+      </div>
+      <div>
+        <h2 className="title">Common Phrases</h2>
+        {/* Container for common phrases */}
+      </div>
+    </div>
+  </main>
+  
   );
 }
 

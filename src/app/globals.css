@@ -7,3 +7,88 @@
   height: auto; /* if you want it to grow with content */
 }
 
+/* CSS styles */
+.text-input-container {
+  margin-bottom: 16px;
+}
+
+.text-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 100px; /* Increase the height as needed */
+  resize: none; /* Prevent resizing if desired */
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.predict-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.control-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.button {
+  padding: 8px 16px;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.predict {
+  background-color: #4f46e5; /* Tailwind color purple-600 */
+}
+
+.play {
+  background-color: #22c55e; /* Tailwind color green-500 */
+}
+
+.pause {
+  background-color: #facc15; /* Tailwind color yellow-400 */
+}
+
+.clear {
+  background-color: #ef4444; /* Tailwind color red-500 */
+}
+
+.delete, .share, .generate {
+  background-color: #3b82f6; /* Tailwind color blue-500 */
+}
+
+.right-section {
+  width: 20%;
+  background-color: #f3f4f6; /* Tailwind color gray-100 */
+  padding: 15px;
+  overflow: auto;
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.keyboard-wrapper {
+  /* Set a max-width if the keyboard is too wide */
+  padding: 2%;
+  max-width: 100%; /* Adjust this value as needed */
+  /* Use margin to center the keyboard in the space */
+  /* You can also set a fixed height or min-height */
+  min-height: 500px; /* Adjust this value as needed to prevent it from looking stretched */
+}
