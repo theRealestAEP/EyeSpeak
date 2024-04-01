@@ -26,12 +26,11 @@ const generatePredictions = async (sentence: string, word:string, index:number) 
         model: 'gpt-4',
         messages: [
             { "role": "system", "content": `You are a text message tool. You will be given a current sentence being typed out and the current word the user is working on and the index of that word. 
-            If the word is in the middle of the sentence you should offer fitting alternatives for that word or spelling corrections. 
-            If the word is at the end of the sentence you should predict which words may come next in the sentence. 
             If the input is blank and the index is 0 its likely the start of a message. 
+            You should offer 3 words that could replace the current word and 3 words that could come next in the sentence.
             The input must be returned in a space separated list, do not use any other delimiters like commas.
             Do not give the user any other feedback except for the 6 words.` },
-            { "role": "user", "content": `the current sentence is:${sentence}, the current word selected:${word}, and the index of the word:${index}` }
+            { "role": "user", "content": `the current sentence is:${sentence}, the current word selected:${word}, and the index of the word:${index-1}` }
         ],
         stream: false,
     });
