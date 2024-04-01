@@ -369,7 +369,7 @@ export default function Home() {
               <button className="button clear" onClick={clearAll}>Clear All</button>
               <button className="button delete" onClick={deleteWord}>Delete Word</button>
               {/* share button will come back when I link up supabase */}
-              {/* <button className="button share">Share</button>  */}
+              <button className="button share">Share</button> 
               {audioLoading
                 ?
                 <div role="status">
