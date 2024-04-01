@@ -32,7 +32,7 @@ const generatePredictions = async (sentence: string, word:string, index:number) 
             2. If the sentence input is empty and the word index is 0, assume it's the beginning of a new message and suggest three words that could start a sentence.
             3. Always return your suggestions as a space-separated list, avoiding any punctuation or delimiters other than spaces.
             4. Your response should strictly consist of the suggested words, without additional commentary or feedback. Tailor your suggestions to either continuation or replacement based on the word's position in the sentence.` },
-            { "role": "user", "content": `the current sentence is:${sentence}, the current word selected:${word}, and the index of the word:${index-1}` }
+            { "role": "user", "content": `the current sentence is:${sentence}, the current word selected:${word}, and the index of the word:${index}` }
         ],
         stream: false,
     });
