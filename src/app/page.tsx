@@ -284,6 +284,33 @@ export default function Home() {
       (keyboardRef.current as any).setInput(newInput); //assertion 
     }
   }
+  const handleShare = async () => {
+    if (!navigator.share) {
+      alert("Sorry, your device does not support sharing.");
+      return;
+    }
+
+    try {
+      if (!audioSpeechBlob) {
+        alert("There is no audio to share.");
+        return;
+      }
+      const file = audioSpeechBlob
+      const filesArray = [
+        new File([file], "audio.mp3", {
+          type: "audio/mpeg",
+        }),
+      ];
+
+      await navigator.share({
+        files: filesArray,
+        title: "Audio File",
+        text: "Check out this audio file!",
+      });
+    } catch (error) {
+      console.error("Sharing failed:", error);
+    }
+  };
 
 
   useEffect(() => {
@@ -369,7 +396,7 @@ export default function Home() {
               <button className="button clear" onClick={clearAll}>Clear All</button>
               <button className="button delete" onClick={deleteWord}>Delete Word</button>
               {/* share button will come back when I link up supabase */}
-              <button className="button share">Share</button> 
+              <button className="button share" onClick={handleShare}>Share</button> 
               {audioLoading
                 ?
                 <div role="status">
