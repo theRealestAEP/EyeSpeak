@@ -218,8 +218,21 @@
   font-size: 15px;
   max-width: 60px;
   min-width: 40px;
-  height: 60px;
+  height: 50px;
   min-height: 40px;
+}
+/* Increase height for larger screens */
+@media screen and (min-width: 768px) {
+  .simple-keyboard.hg-theme-ios.hg-theme-default .hg-button {
+    height: 60px; /* Adjust as needed */
+  }
+}
+
+/* Increase height for even larger screens */
+@media screen and (min-width: 1200px) {
+  .simple-keyboard.hg-theme-ios.hg-theme-default .hg-button {
+    height: 85px; /* Adjust as needed */
+  }
 }
 
 .simple-keyboard.hg-theme-ios.hg-theme-default .hg-button:active,
