@@ -3,8 +3,10 @@
 @tailwind utilities;
 
 .custom-textbox-height {
-  min-height: 100px; /* or any other value */
-  height: auto; /* if you want it to grow with content */
+  min-height: 100px;
+  /* or any other value */
+  height: auto;
+  /* if you want it to grow with content */
 }
 
 /* CSS styles */
@@ -18,13 +20,16 @@
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  height: 100px; /* Increase the height as needed */
-  resize: none; /* Prevent resizing if desired */
+  height: 100px;
+  /* Increase the height as needed */
+  resize: none;
+  /* Prevent resizing if desired */
 }
 
 .button-container {
   display: flex;
   justify-content: space-between;
+  gap: 20px;
 }
 
 .predict-buttons {
@@ -46,31 +51,60 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  max-width: 100%;
 }
 
+/* Increase max-width and font-size for larger screens */
+@media screen and (min-width: 768px) {
+  .button {
+    max-width: 100%; /* Adjust as needed */
+    font-size: 18px; /* Adjust as needed */
+  }
+}
+
+/* Increase max-width and font-size for even larger screens */
+@media screen and (min-width: 1200px) {
+  .button {
+    max-width: 100%; /* Adjust as needed */
+    font-size: 25px; /* Adjust as needed */
+  }
+}
 .predict {
-  background-color: #4f46e5; /* Tailwind color purple-600 */
+  background-color: #4f46e5;
+  /* Tailwind color purple-600 */
 }
 
 .play {
-  background-color: #22c55e; /* Tailwind color green-500 */
+  background-color: #22c55e;
+  /* Tailwind color green-500 */
+}
+
+.play-disabled {
+  background-color: #adb5bb;
+  /* Tailwind color green-500 */
 }
 
 .pause {
-  background-color: #facc15; /* Tailwind color yellow-400 */
+  background-color: #facc15;
+  /* Tailwind color yellow-400 */
 }
 
 .clear {
-  background-color: #ef4444; /* Tailwind color red-500 */
+  background-color: #ef4444;
+  /* Tailwind color red-500 */
 }
 
-.delete, .share, .generate {
-  background-color: #3b82f6; /* Tailwind color blue-500 */
+.delete,
+.share,
+.generate {
+  background-color: #3b82f6;
+  /* Tailwind color blue-500 */
 }
 
 .right-section {
   width: 20%;
-  background-color: #f3f4f6; /* Tailwind color gray-100 */
+  background-color: #f3f4f6;
+  /* Tailwind color gray-100 */
   padding: 15px;
   overflow: auto;
   position: fixed;
@@ -84,54 +118,91 @@
   margin-bottom: 8px;
 }
 
-.keyboard-wrapper {
-  /* Set a max-width if the keyboard is too wide */
-  /* padding: 2%; */
-  max-width: 100%; 
-  /* Adjust this value as needed */
-  /* Use margin to center the keyboard in the space */
-  /* You can also set a fixed height or min-height */
-  /* min-height: 700px;  */
-  /* Adjust this value as needed to prevent it from looking stretched */
+.glow {
+  outline: #ff0011 auto 5px; /* Change to the color and size you want */
 }
 
 
+/* Styles for iPad Air */
+@media (max-width: 1180px) {
+  .simple-keyboard {
+    position: fixed;
+    bottom: 5%;
+    left: 1%;
+    max-width: 75%;
+    margin: auto;
+  }
 
-/* make this more reactive to screen size but should be large */
-.simple-keyboard {
-  max-width: 1500px;
+  .simple-keyboard.hg-theme-ios {
+    width: 100%;
+    margin: auto;
+  }
+}
+/* Styles for iPad Max */
+@media (min-width: 1181px) and (max-width: 1366px) {
+  .simple-keyboard {
+    position: fixed;
+    bottom: 5%;
+    left: 1%;
+    max-width: 78%;
+    margin: auto;
+  }
+
+  .simple-keyboard.hg-theme-ios {
+    width: 100%;
+    margin: auto;
+  }
+}
+/* Styles for larger than ipad max */
+@media (min-width: 1367px) and (max-width: 2000px) {
+  .simple-keyboard {
+    position: fixed;
+    bottom: 5%;
+    left: 1%;
+    max-width: 78%;
+    margin: auto;
+  }
+
+  .simple-keyboard.hg-theme-ios {
+    width: 100%;
+    margin: auto;
+  }
 }
 
-.simple-keyboard.hg-theme-ios {
-  width: 1300px;
-  margin: auto;
-}
+
 .simple-keyboard.hg-theme-ios.hg-theme-default .hg-row .hg-button {
   flex-grow: 1;
   cursor: pointer;
   max-width: initial;
 }
+
 .simple-keyboard.hg-theme-ios .hg-row {
   display: flex;
 }
+
 .simple-keyboard.hg-theme-ios .hg-row:not(:last-child) {
   margin-bottom: 5px;
 }
+
 .simple-keyboard.hg-theme-ios .hg-row .hg-button:not(:last-child) {
   margin-right: 5px;
 }
+
 .simple-keyboard.hg-theme-ios .hg-row:nth-child(2) {
   margin-left: 18px;
 }
+
 .simple-keyboard.hg-theme-ios.hg-theme-default {
   background-color: rgba(0, 0, 0, 0.1);
   padding: 5px;
   border-radius: 5px;
 }
+
 .simple-keyboard.hg-theme-ios.hg-theme-default.hg-layout-custom {
   background-color: #e5e5e5;
   padding: 5px;
 }
+
 .simple-keyboard.hg-theme-ios.hg-theme-default .hg-button {
   border-radius: 5px;
   box-sizing: border-box;
@@ -144,33 +215,38 @@
   justify-content: center;
   box-shadow: none;
   font-weight: 400;
-  font-size: 20px;
-  max-width: 80px;
-  min-width: 80px;
-  height: 80px;
-  min-height: 80px;
+  font-size: 15px;
+  max-width: 60px;
+  min-width: 40px;
+  height: 60px;
+  min-height: 40px;
 }
+
 .simple-keyboard.hg-theme-ios.hg-theme-default .hg-button:active,
 .simple-keyboard.hg-theme-ios.hg-theme-default .hg-button:focus {
   background: #e4e4e4;
 }
+
 .simple-keyboard.hg-theme-ios.hg-theme-default .hg-button.hg-functionBtn {
   background-color: #adb5bb;
 }
+
 .simple-keyboard.hg-theme-ios.hg-theme-default .hg-button.hg-button-space,
 .simple-keyboard.hg-theme-ios.hg-theme-default .hg-button.hg-button-shift,
-.simple-keyboard.hg-theme-ios.hg-theme-default
-  .hg-button.hg-button-shiftactivated {
+.simple-keyboard.hg-theme-ios.hg-theme-default .hg-button.hg-button-shiftactivated {
   background-color: #ffffff;
 }
+
 .simple-keyboard.hg-theme-ios.hg-theme-default .hg-button-space {
   max-width: 448px;
   min-width: 448px;
 }
+
 .simple-keyboard.hg-theme-ios.hg-theme-default .hg-button-enter {
   max-width: 110px;
-  min-width: 110px;
+  min-width: 100px;
 }
+
 .simple-keyboard.hg-theme-ios.hg-theme-default .hg-button-altright,
 .simple-keyboard.hg-theme-ios.hg-theme-default .hg-button-back {
   min-width: 80px;
