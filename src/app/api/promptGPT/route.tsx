@@ -25,11 +25,13 @@ const generatePredictions = async (sentence: string, word:string, index:number) 
     const response = await openai.chat.completions.create({
         model: 'gpt-4',
         messages: [
-            { "role": "system", "content": `You are a text message tool. You will be given a current sentence being typed out and the current word the user is working on and the index of that word. 
-            If the input is blank and the index is 0 its likely the start of a message. 
-            You should offer 3 words that could replace the current word and 3 words that could come next in the sentence.
-            The input must be returned in a space separated list, do not use any other delimiters like commas.
-            Do not give the user any other feedback except for the 6 words.` },
+            { "role": "system", "content": `You are an advanced text message autocomplete tool designed to enhance sentence completion by providing word suggestions based on the typing context. Your operation will vary slightly depending on the position of the word in the sentence:
+            1. When receiving a sentence fragment, the current word under consideration, and its position in the sentence, you should:
+               - If the word's index is at the end of the sentence, suggest three words that could logically follow to extend the sentence.
+               - If the word's index is in the middle of the sentence, suggest three alternative words that could replace it, ensuring they fit the context and grammar of the sentence.
+            2. If the sentence input is empty and the word index is 0, assume it's the beginning of a new message and suggest three words that could start a sentence.
+            3. Always return your suggestions as a space-separated list, avoiding any punctuation or delimiters other than spaces.
+            4. Your response should strictly consist of the suggested words, without additional commentary or feedback. Tailor your suggestions to either continuation or replacement based on the word's position in the sentence.` },
             { "role": "user", "content": `the current sentence is:${sentence}, the current word selected:${word}, and the index of the word:${index-1}` }
         ],
         stream: false,
