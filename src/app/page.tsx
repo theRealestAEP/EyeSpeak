@@ -316,6 +316,7 @@ export default function Home() {
                 {arrayInput.map((word, index) => {
                   return (
                     <div
+                      key={index}
                       className={`mr-2 mb-2 bg-slate-200 p-2 rounded-md border-black ${index === selectedWordIndex ? 'glow' : ''} text-lg`}
                       onClick={(event) => selectWord(event, word, index)}
                     >
