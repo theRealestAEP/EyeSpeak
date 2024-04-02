@@ -115,7 +115,7 @@ export default function Home() {
     // console.log('adding message to past messages')
     let tempMessages = [...pastMessages];
     tempMessages.push(message)
-    if (tempMessages.length > 7) {
+    if (tempMessages.length > 3) {
       tempMessages.shift()
     }
     setPastMessages(tempMessages)
@@ -177,26 +177,6 @@ export default function Home() {
       (keyboardRef.current as any).setInput(""); //assertion 
     }
   }
-
-  // const deleteWord = () => {
-  //   const words = input.trim().split(/\s+/);
-  //   words.pop(); // Remove the last word
-  //   if (words.length === 0) {
-  //     setInput("");
-  //     setArrayInput([]);
-  //     if (keyboardRef.current !== null) {
-  //       (keyboardRef.current as any).setInput(""); //assertion 
-  //     }
-  //   }
-  //   else {
-  //     const newInput = words.join(" ") + " "; // Reconstruct the input, add space for separation
-  //     setInput(newInput);
-  //     if (keyboardRef.current !== null) {
-  //       (keyboardRef.current as any).setInput(newInput); //assertion 
-  //     }
-  //     setArrayInput(newInput.split(" "));
-  //   }
-  // };
 
   const deleteWord = () => {
     const words = input.trim().split(/\s+/);
@@ -312,6 +292,34 @@ export default function Home() {
     }
   };
 
+  const magicFix = async () => {
+    // console.log('Generating predictions');
+    const response = await fetch('/api/magicFix', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text: input }),
+    });
+
+    if (!response.ok) {
+      console.error('HTTP error', response.status);
+    } else {
+      const data = await response.json();
+      console.log(data);
+      let newArray = [...data.magicArray]; // Create a copy of data.magicArray
+      newArray.push(" "); // Add a space to newArray
+
+      console.log(newArray)
+      setArrayInput(newArray)
+      setSelectedWordIndex(newArray.length - 1)
+      let newInput = newArray.join(" ")
+      setInput(newInput)
+      if (keyboardRef.current !== null) {
+        (keyboardRef.current as any).setInput(newInput); //assertion 
+      }
+    }
+  }
 
   useEffect(() => {
     if (input != "") {
@@ -344,7 +352,7 @@ export default function Home() {
                   return (
                     <div
                       key={index}
-                      className={`mr-2 mb-2 bg-slate-200 p-2 rounded-md border-black ${index === selectedWordIndex ? 'glow' : ''} text-lg`}
+                      className={`mr-2 mb-2 bg-slate-200 p-2 rounded-md border-black text-lg font-bold ${index === selectedWordIndex ? 'glow' : ''}`}
                       onClick={(event) => selectWord(event, word, index)}
                     >
                       {word}
@@ -396,7 +404,7 @@ export default function Home() {
               <button className="button clear" onClick={clearAll}>Clear All</button>
               <button className="button delete" onClick={deleteWord}>Delete Word</button>
               {/* share button will come back when I link up supabase */}
-              <button className="button share" onClick={handleShare}>Share</button> 
+              <button className="button share" onClick={handleShare}>Share</button>
               {audioLoading
                 ?
                 <div role="status">
@@ -411,19 +419,7 @@ export default function Home() {
               }
             </div>
           </div>
-          {/* <div style={{ width: '30vw', height: '5vh' }}>
-            {audioSpeechBlob && (
-              <AudioVisualizer
-                ref={visualizerRef}
-                blob={audioSpeechBlob}
-                width={1500}  // 100% of the parent div's width
-                height={100}  // 100% of the parent div's height
-                barWidth={1}
-                gap={0}
-                barColor={'#f76565'}
-              />
-            )}
-          </div> */}
+
         </div>
         {/* Bottom Left: Keyboard */}
         <div>
@@ -435,6 +431,19 @@ export default function Home() {
       </div>
       {/* Right Section: Past messages and common phrases */}
       <div className="right-section">
+        <div>
+          <h2 className="title">Common Phrases</h2>
+          {/* Container for common phrases */}
+          {commonPhrases.map((message, index) => (
+            <div
+              key={index}
+              className="bg-slate-300 p-2 rounded-md mb-2 cursor-pointer hover:bg-slate-400 font-bold text-lg"
+              onClick={() => enterSentence(message)} // Wrap enterPastMessage in an arrow function
+            >
+              {message}
+            </div>
+          ))}
+        </div>
         <div>
           <h2 className="title">Past Messages</h2>
           {/* Container for past messages */}
@@ -448,19 +457,8 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <div>
-          <h2 className="title">Common Phrases</h2>
-          {/* Container for common phrases */}
-          {commonPhrases.map((message, index) => (
-            <div
-              key={index}
-              className="bg-slate-300 p-2 rounded-md mb-2 cursor-pointer hover:bg-slate-400"
-              onClick={() => enterSentence(message)} // Wrap enterPastMessage in an arrow function
-            >
-              {message}
-            </div>
-          ))}
-        </div>
+        <button className="button magic" onClick={magicFix}>Magic Fix</button>
+
       </div>
     </main>
 

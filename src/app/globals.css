@@ -17,12 +17,13 @@
 .text-input {
   width: 100%;
   padding: 8px;
-  font-size: 16px;
+  font-size: 25px;
   border: 1px solid #ccc;
   border-radius: 4px;
   height: 100px;
   /* Increase the height as needed */
   resize: none;
+  font-weight: bold;
   /* Prevent resizing if desired */
 }
 
@@ -47,11 +48,12 @@
 .button {
   padding: 8px 16px;
   color: white;
-  font-size: 16px;
+  font-size: 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   max-width: 100%;
+  font-weight: bold;
 }
 
 /* Increase max-width and font-size for larger screens */
@@ -81,6 +83,9 @@
 
 .play-disabled {
   background-color: #adb5bb;
+  font-weight: bold;
+  font-size: 20px;
+  border-radius: 4px;
   /* Tailwind color green-500 */
 }
 
@@ -92,6 +97,22 @@
 .clear {
   background-color: #ef4444;
   /* Tailwind color red-500 */
+}
+
+.magic{
+  background-color: #aa00ff;
+}
+.column {
+  position: relative; /* Add this line */
+  /* rest of your styles */
+}
+
+.button.magic {
+  position: absolute;
+  bottom: 5%;
+  width: 90%; /* Make the button as wide as its parent */
+  height: 10%;
+  /* rest of your styles */
 }
 
 .delete,
@@ -116,6 +137,7 @@
 .title {
   font-weight: bold;
   margin-bottom: 8px;
+  font-size: 25px;
 }
 
 .glow {
@@ -215,7 +237,8 @@
   justify-content: center;
   box-shadow: none;
   font-weight: 400;
-  font-size: 15px;
+  font-size: 25px;
+  font-weight: bold; /* Make the font bold */
   max-width: 60px;
   min-width: 40px;
   height: 50px;
