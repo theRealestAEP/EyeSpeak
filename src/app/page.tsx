@@ -27,7 +27,7 @@ export default function Home() {
   const [pastMessages, setPastMessages] = useState<string[]>([])
 
 
-  const commonPhrases = ["Thank you! ", "Can you come over here really, quickly? ", "Hey how are you doing today? ", "How was your day "]
+  const commonPhrases = ["Thank you! ", "Can you come over here really, quickly? ", "Hey how are you doing today? ", "Yes!", "No."]
   useEffect(() => {
     const scrollableDiv = scrollableDivRef.current;
 
