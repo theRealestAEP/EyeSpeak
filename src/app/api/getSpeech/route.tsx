@@ -1,4 +1,4 @@
-const speakerID = '9DieBUJyEAiLNdK8CupU'
+const speakerID = 'wQHnBeDjtQUASXBO9akt'
 const gerenateAudio = async (text: string) => {
     const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${speakerID}?output_format=mp3_44100_96`, {
         method: 'POST',
