@@ -31,22 +31,23 @@
   display: flex;
   justify-content: space-between;
   gap: 20px;
+  margin-top: 30px;
 }
 
 .predict-buttons {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  justify-content: center;
   gap: 8px;
 }
 
 .control-buttons {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  justify-content: center;
   gap: 8px;
 }
 
 .button {
-  padding: 8px 16px;
+  padding: 12px 30px;
   color: white;
   font-size: 20px;
   border: none;
@@ -55,12 +56,67 @@
   max-width: 100%;
   font-weight: bold;
 }
+.keyboard-wrapper {
+  /* display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 20px; */
+  left: 50%;
+  bottom: 0;
+}
+
+.kbd-button {
+  background-color: #e9e8e8;
+  color: black;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  border: none; /* Assuming no border needed */
+}
+
+.kbd-button:hover {
+  background-color: #555555;
+}
+
+.kbd-space {
+  padding: 24px 200px;
+  font-size: 1.25rem; /* 20px */
+}
+
+.kbd-shift {
+  padding: 24px 128px;
+  font-size: 1.25rem; /* 20px */
+}
+
+.kbd-default {
+  padding: 24px 60px;
+  font-size: 1.25rem; /* 20px */
+}
+
+@media (max-width: 1366px) {
+  .kbd-space {
+    padding: 30px 200px;
+    font-size: 1.25rem; /* 16px */
+  }
+
+  .kbd-shift {
+    padding: 40px 64px;
+    font-size: 1.25rem; 
+  }
+
+  .kbd-default {
+    padding: 30px 40px;
+    font-size: 1.25rem; 
+  }
+}
+
 
 /* Increase max-width and font-size for larger screens */
 @media screen and (min-width: 768px) {
   .button {
     max-width: 100%; /* Adjust as needed */
     font-size: 18px; /* Adjust as needed */
+    height: 80px;
   }
 }
 
@@ -69,8 +125,10 @@
   .button {
     max-width: 100%; /* Adjust as needed */
     font-size: 25px; /* Adjust as needed */
+    height: 80px;
   }
 }
+
 .predict {
   background-color: #4f46e5;
   /* Tailwind color purple-600 */
@@ -108,13 +166,18 @@
 }
 
 .button.magic {
-  position: absolute;
-  bottom: 5%;
-  width: 90%; /* Make the button as wide as its parent */
-  height: 10%;
+  /* position: absolute; */
+  /* bottom: 5%; */
+  /* width: 90%; Make the button as wide as its parent */
+  /* height: 10%; */
   /* rest of your styles */
 }
 
+.space-button {
+  width: 448px; /* Adjust the width here */
+}
+
+ 
 .delete,
 .share,
 .generate {
@@ -145,13 +208,14 @@
 }
 
 
+
 /* Styles for iPad Air */
 @media (max-width: 1180px) {
   .simple-keyboard {
     position: fixed;
     bottom: 5%;
     left: 1%;
-    max-width: 75%;
+    max-width: 97%;
     margin: auto;
   }
 
@@ -166,7 +230,7 @@
     position: fixed;
     bottom: 5%;
     left: 1%;
-    max-width: 78%;
+    max-width: 97%;
     margin: auto;
   }
 
@@ -181,7 +245,7 @@
     position: fixed;
     bottom: 5%;
     left: 1%;
-    max-width: 78%;
+    max-width: 97%;
     margin: auto;
   }
 

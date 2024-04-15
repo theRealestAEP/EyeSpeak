@@ -331,11 +331,55 @@ export default function Home() {
     }
     generatePredictions(arrayInput[selectedWordIndex], selectedWordIndex)
   }, [input]);
+  // Array of keys for the keyboard
+  const rows = [
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'backspace'],
+    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+    ['z', 'x', 'c', 'v', 'b', 'n', 'm',],
+    ['space']
+  ];
+
+  const getButtonClass = (key:string) => {
+    switch (key) {
+      case 'space':
+        return "kbd-button kbd-space";
+      case 'shift':
+        return "kbd-button kbd-shift";
+      default:
+        return "kbd-button kbd-default";
+    }
+  };
+  
+
+
+  const keyboardPress = (key: string) => {
+    console.log('key pressed: ' + key)
+
+    //handle case for space and backspace
+    if (key === 'backspace') {
+      let newInput = input.slice(0, -1);
+      setInput(newInput);
+      return;
+    }
+    if (key === 'space') {
+      let newInput = input + ' ';
+      setInput(newInput);
+      return;
+    }
+    else {
+
+      let newInput = input + key;
+
+      setInput(newInput);
+    }
+
+  }
 
   return (
     <main>
       {/* Left Section: Text input, buttons, and keyboard */}
-      <div className="flex flex-col w-3/4">
+      <div className="flex flex-col">
         {/* Top Left: Text input and buttons */}
         <div className="p-4 space-y-4">
           {/* Text input */}
@@ -347,12 +391,12 @@ export default function Home() {
               onChange={onChangeInput}
             />
             <div className="flex">
-              <div ref={scrollableDivRef} className="flex flex-wrap mb-2 mt-2 overflow-y-auto" style={{ maxHeight: '15vh' }}>
+              <div ref={scrollableDivRef} className="flex flex-wrap mb-2 mt-2 overflow-y-auto" style={{ maxHeight: '10vh' }}>
                 {arrayInput.map((word, index) => {
                   return (
                     <div
                       key={index}
-                      className={`mr-2 mb-2 bg-slate-200 p-2 rounded-md border-black text-lg font-bold ${index === selectedWordIndex ? 'glow' : ''}`}
+                      className={`mr-2 mb-2 bg-slate-200 p-2 rounded-md border-black text-3xl font-bold ${index === selectedWordIndex ? 'glow' : ''}`}
                       onClick={(event) => selectWord(event, word, index)}
                     >
                       {word}
@@ -362,17 +406,46 @@ export default function Home() {
               </div>
               {isScrollable && (
                 <div className="flex flex-col justify-center ml-4">
-                  <button id="scrollUp" className="mb-2 bg-blue-300 rounded-md p-1">Up</button>
-                  <button id="scrollDown" className="bg-blue-300 rounded-md p-1">Down</button>
+                  <button id="scrollUp" className="mb-2 bg-blue-300 rounded-md p-2 text-3xl">Up</button>
+                  <button id="scrollDown" className="bg-blue-300 rounded-md p-2 text-3xl">Down</button>
                 </div>
               )}
 
             </div>
           </div>
           {/* Predict and Control buttons */}
-          <div className="button-container">
+          <div className="flex flex-col">
+            {/* <div className="button-container"> */}
             {/* Predict buttons */}
-            <div>
+            <div className="button-container control-buttons">
+              {audioElement ?
+                <button className="button play" onClick={playAudio}>Play</button>
+                :
+                <button className="play-disabled">No Audio</button>
+              }
+
+
+              <button className="button delete" onClick={deleteWord}>Delete Word</button>
+              {/* share button will come back when I link up supabase */}
+              <button className="button clear" onClick={clearAll}>Clear All</button>
+              <button className="button share" onClick={handleShare}>Share</button>
+              <button className="button pause" onClick={pauseAudio}>Pause</button>
+              <button className="button magic" onClick={magicFix}>Magic Fix</button>
+              {audioLoading
+                ?
+                <div role="status">
+                  <svg aria-hidden="true" className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
+                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
+                  </svg>
+                  <span className="sr-only">Loading...</span>
+                </div>
+
+                : <button className="button generate" onClick={generateAudio}>Generate Audio</button>
+              }
+            </div>
+            <div className="button-container predict-buttons">
+              {/* I need to move these under the buttons beloww */}
               {predictionsLoading ? <div role="status">
                 <svg aria-hidden="true" className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
@@ -393,47 +466,39 @@ export default function Home() {
               }
             </div>
             {/* Play/Pause/Clear buttons */}
-            <div className="control-buttons">
-              {audioElement ?
-                <button className="button play" onClick={playAudio}>Play</button>
-                :
-                <button className="play-disabled">No Audio</button>
-              }
 
-              <button className="button pause" onClick={pauseAudio}>Pause</button>
-              <button className="button clear" onClick={clearAll}>Clear All</button>
-              <button className="button delete" onClick={deleteWord}>Delete Word</button>
-              {/* share button will come back when I link up supabase */}
-              <button className="button share" onClick={handleShare}>Share</button>
-              {audioLoading
-                ?
-                <div role="status">
-                  <svg aria-hidden="true" className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
-                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
-                  </svg>
-                  <span className="sr-only">Loading...</span>
-                </div>
+            {/* </div> */}
 
-                : <button className="button generate" onClick={generateAudio}>Generate Audio</button>
-              }
-            </div>
           </div>
-
-        </div>
-        {/* Bottom Left: Keyboard */}
-        <div>
-          <KeyboardWrapper
+          {/* Bottom Left: Keyboard */}
+          <div>
+            {/* <KeyboardWrapper
             keyboardRef={keyboardRef}
             onChange={setInput}
-          />
+          /> */}
+            <div className="keyboard-wrapper">
+              {rows.map((row, index) => (
+                <div key={index} className="flex justify-center gap-2 mb-2">
+                  {row.map((key) => (
+                    <button
+                      key={key}
+                      onClick={() => keyboardPress(key)}
+                      className={getButtonClass(key)}
+                    >
+                      {key.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
+
       {/* Right Section: Past messages and common phrases */}
-      <div className="right-section">
+      {/* <div className="right-section">
         <div>
           <h2 className="title">Common Phrases</h2>
-          {/* Container for common phrases */}
           {commonPhrases.map((message, index) => (
             <div
               key={index}
@@ -446,7 +511,6 @@ export default function Home() {
         </div>
         <div>
           <h2 className="title">Past Messages</h2>
-          {/* Container for past messages */}
           {pastMessages.map((message, index) => (
             <div
               key={index}
@@ -457,9 +521,9 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <button className="button magic" onClick={magicFix}>Magic Fix</button>
 
-      </div>
+
+      </div> */}
     </main>
 
   );
