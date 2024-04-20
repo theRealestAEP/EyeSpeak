@@ -37,6 +37,9 @@
 .predict-buttons {
   display: flex;
   justify-content: center;
+  overflow-x: auto; 
+  /* Adds a scrollbar if the items overflow the container horizontally */
+  flex-wrap: nowrap; /* Prevents the items from wrapping onto the next line */
   gap: 8px;
 }
 

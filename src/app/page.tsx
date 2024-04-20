@@ -205,6 +205,14 @@ export default function Home() {
   const generatePredictions = async (word: string, index: number) => {
     setPredictionsLoading(true)
     // console.log('Generating predictions');
+    const autoComplete = await fetch('/api/autoComplete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text: input, word: word, index: index }),
+    });
+
     const response = await fetch('/api/promptGPT', {
       method: 'POST',
       headers: {
@@ -213,19 +221,26 @@ export default function Home() {
       body: JSON.stringify({ text: input, word: word, index: index }),
     });
 
-    if (!response.ok) {
+    if (!response.ok || !autoComplete.ok) {
       setAudioLoading(false)
       //throw an error here 
       console.error('HTTP error', response.status);
     } else {
       const data = await response.json();
+      const autoCompleteData = await autoComplete.json();
+
       setPredictionsLoading(false)
       // console.log(data);
       //remove all commas and periods from the predictions
       // console.log(data.predictionsArray)
       data.predictionsArray = data.predictionsArray.map((word: string) => word.replaceAll(',', ''))
-      setPredictedWords(data.predictionsArray.slice(0, 6))
-      // set the predictions here
+      autoCompleteData.predictionsArray = autoCompleteData.predictionsArray.map((word: string) => word.replaceAll(',', ''))
+
+      let combinedArray = data.predictionsArray.slice(0, 4).concat(autoCompleteData.predictionsArray.slice(0, 4));
+      combinedArray = combinedArray.filter((value:any, index:any, self:any) => self.indexOf(value) === index);
+      setPredictedWords(combinedArray)
+      // setAudioLoading(false)
+      // set the predictions herea
 
 
     }
@@ -308,7 +323,7 @@ export default function Home() {
       const data = await response.json();
       console.log(data);
       let newArray = [...data.magicArray]; // Create a copy of data.magicArray
-      newArray.push(" "); // Add a space to newArray
+      // newArray.push(" "); // Add a space to newArray
 
       console.log(newArray)
       setArrayInput(newArray)

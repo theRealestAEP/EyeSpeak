@@ -58,7 +58,7 @@ export async function POST(req: Request) {
 
     let predictions = await generatePredictions(text, data.word, data.index)
 
-    let predictionsArray = predictions!.split(' ') // split the predictions into an array of words
+    let predictionsArray = predictions!.replace(/"/g, '').split(' '); // split the predictions into an array of words
 
     // Return a response object
     return new Response(JSON.stringify({predictionsArray: predictionsArray}), {
