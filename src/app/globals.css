@@ -142,6 +142,11 @@
   /* Tailwind color green-500 */
 }
 
+.save {
+  background-color: #ff9900;
+  /* Tailwind color green-500 */
+}
+
 .play-disabled {
   background-color: #adb5bb;
   font-weight: bold;

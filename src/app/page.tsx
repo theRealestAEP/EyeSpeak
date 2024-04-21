@@ -1,9 +1,7 @@
 'use client'
-import Image from "next/image";
 import React, { FunctionComponent, useState, useRef, ChangeEvent, useEffect } from "react";
-import KeyboardWrapper from "./components/keyboardWrapper";
-// @ts-ignore
-import { AudioVisualizer } from 'react-audio-visualize';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Home() {
   const [input, setInput] = useState(""); //split this into an array 
@@ -16,6 +14,7 @@ export default function Home() {
   const [predictedWords, setPredictedWords] = useState<string[]>([]);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const [selectedWordIndex, setSelectedWordIndex] = useState(0);
+  const [savedPhrasesOpen, setsavedPhrasesOpen] = useState(false)
 
   // Inside your component
   const scrollableDivRef = useRef<HTMLDivElement>(null);
@@ -27,7 +26,16 @@ export default function Home() {
   const [pastMessages, setPastMessages] = useState<string[]>([])
 
 
-  const commonPhrases = ["Thank you! ", "Can you come over here really, quickly? ", "Hey how are you doing today? ", "Yes!", "No."]
+  // const commonPhrases = ["Thank you! ", "Can you come over here really, quickly? ", "Hey how are you doing today? ", "Yes!", "No."]
+  const [commonPhrases, setCommonPhrases] = useState<string[]>([]);
+
+  useEffect(() => {
+    const storedPhrases = localStorage.getItem('commonPhrases');
+    if (storedPhrases) {
+      setCommonPhrases(JSON.parse(storedPhrases));
+    }
+  }, []);
+
   useEffect(() => {
     const scrollableDiv = scrollableDivRef.current;
 
@@ -237,7 +245,7 @@ export default function Home() {
       autoCompleteData.predictionsArray = autoCompleteData.predictionsArray.map((word: string) => word.replaceAll(',', ''))
 
       let combinedArray = data.predictionsArray.slice(0, 4).concat(autoCompleteData.predictionsArray.slice(0, 4));
-      combinedArray = combinedArray.filter((value:any, index:any, self:any) => self.indexOf(value) === index);
+      combinedArray = combinedArray.filter((value: any, index: any, self: any) => self.indexOf(value) === index);
       setPredictedWords(combinedArray)
       // setAudioLoading(false)
       // set the predictions herea
@@ -336,6 +344,17 @@ export default function Home() {
     }
   }
 
+  const insertSavedPhrase = (phrase: string) => {
+    let newArray = phrase.split(" ");
+    setArrayInput(newArray)
+    setSelectedWordIndex(newArray.length - 1)
+    let newInput = newArray.join(" ")
+    setInput(newInput)
+    if (keyboardRef.current !== null) {
+      (keyboardRef.current as any).setInput(newInput); //assertion 
+    }
+  }
+
   useEffect(() => {
     if (input != "") {
       setArrayInput(input.split(" "))
@@ -355,7 +374,7 @@ export default function Home() {
     ['space']
   ];
 
-  const getButtonClass = (key:string) => {
+  const getButtonClass = (key: string) => {
     switch (key) {
       case 'space':
         return "kbd-button kbd-space";
@@ -365,7 +384,7 @@ export default function Home() {
         return "kbd-button kbd-default";
     }
   };
-  
+
 
 
   const keyboardPress = (key: string) => {
@@ -389,6 +408,28 @@ export default function Home() {
       setInput(newInput);
     }
 
+  }
+
+  //Need to add a function to save as a common phrase - common phrases will be stored in local storage and fetched on page load 
+  const savePhrase = () => {
+    //save the current input as a common phrase
+    //add to local storage 
+    //fetch the common phrases on page load
+    // Assume `input` is the current input you want to save
+    if(input == ""){
+      toast("Please enter a phrase to save!");
+      return;
+    }
+
+    let commonPhrases: string[] = localStorage.getItem('commonPhrases') ? JSON.parse(localStorage.getItem('commonPhrases')!) : [];
+    // Add the current input to the array
+    commonPhrases.push(input);
+    setCommonPhrases(commonPhrases);
+    toast("Saved!");
+    // setCommonPhrases(commonPhrases);
+    // toast that it has been saved 
+    // Save the updated array back to local storage
+    localStorage.setItem('commonPhrases', JSON.stringify(commonPhrases));
   }
 
   return (
@@ -430,8 +471,6 @@ export default function Home() {
           </div>
           {/* Predict and Control buttons */}
           <div className="flex flex-col">
-            {/* <div className="button-container"> */}
-            {/* Predict buttons */}
             <div className="button-container control-buttons">
               {audioElement ?
                 <button className="button play" onClick={playAudio}>Play</button>
@@ -444,8 +483,10 @@ export default function Home() {
               {/* share button will come back when I link up supabase */}
               <button className="button clear" onClick={clearAll}>Clear All</button>
               <button className="button share" onClick={handleShare}>Share</button>
-              <button className="button pause" onClick={pauseAudio}>Pause</button>
+              {/* <button className="button pause" onClick={pauseAudio}>Pause</button> */}
               <button className="button magic" onClick={magicFix}>Magic Fix</button>
+              <button className="button save" onClick={savePhrase}>Save</button>
+
               {audioLoading
                 ?
                 <div role="status">
@@ -460,7 +501,7 @@ export default function Home() {
               }
             </div>
             <div className="button-container predict-buttons">
-              {/* I need to move these under the buttons beloww */}
+              {/* I need to move these under the buttons below */}
               {predictionsLoading ? <div role="status">
                 <svg aria-hidden="true" className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
@@ -480,17 +521,8 @@ export default function Home() {
                 </div>
               }
             </div>
-            {/* Play/Pause/Clear buttons */}
-
-            {/* </div> */}
-
           </div>
-          {/* Bottom Left: Keyboard */}
           <div>
-            {/* <KeyboardWrapper
-            keyboardRef={keyboardRef}
-            onChange={setInput}
-          /> */}
             <div className="keyboard-wrapper">
               {rows.map((row, index) => (
                 <div key={index} className="flex justify-center gap-2 mb-2">
@@ -507,38 +539,35 @@ export default function Home() {
               ))}
             </div>
           </div>
+          <div >
+            {/* button to open the modal for saved phrases */}
+            <button className="absolute bottom-0 right-0 bg-purple-600 text-4xl rounded-md p-6 font-bold text-white" onClick={() => setsavedPhrasesOpen(!savedPhrasesOpen)}>Saved Phrases</button>
+          </div>
+          <div>
+            {savedPhrasesOpen && (
+              <div className="fixed inset-0 bg-gray-500 bg-opacity-50 z-10 flex items-center justify-center overflow-y-auto">
+
+                <div className="bg-white p-6 rounded shadow-lg">
+                  {/* Modal content goes here */}
+                  <div className="grid grid-cols-3 gap-4">
+                    {commonPhrases.length === 0 ? (
+                      <p>Nothing saved yet</p>
+                    ) : (
+                      commonPhrases.map((phrase, index) => (
+                        <div key={index} onClick={()=>{insertSavedPhrase(phrase); setsavedPhrasesOpen(!savedPhrasesOpen)}} className="card bg-blue-100 p-6 text-3xl rounded shadow text-bold">
+                          <p>{phrase}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <button className="absolute top-0 right-0 bg-red-600 text-6xl rounded-md p-6 font-bold text-white" onClick={() => setsavedPhrasesOpen(!savedPhrasesOpen)}>Close</button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
+        <ToastContainer />
       </div>
-
-      {/* Right Section: Past messages and common phrases */}
-      {/* <div className="right-section">
-        <div>
-          <h2 className="title">Common Phrases</h2>
-          {commonPhrases.map((message, index) => (
-            <div
-              key={index}
-              className="bg-slate-300 p-2 rounded-md mb-2 cursor-pointer hover:bg-slate-400 font-bold text-lg"
-              onClick={() => enterSentence(message)} // Wrap enterPastMessage in an arrow function
-            >
-              {message}
-            </div>
-          ))}
-        </div>
-        <div>
-          <h2 className="title">Past Messages</h2>
-          {pastMessages.map((message, index) => (
-            <div
-              key={index}
-              className="bg-slate-300 p-2 rounded-md mb-2 cursor-pointer hover:bg-slate-400"
-              onClick={() => enterSentence(message)} // Wrap enterPastMessage in an arrow function
-            >
-              {message}
-            </div>
-          ))}
-        </div>
-
-
-      </div> */}
     </main>
 
   );

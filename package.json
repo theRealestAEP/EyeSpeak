@@ -16,6 +16,7 @@
     "react-audio-visualize": "^1.1.3",
     "react-dom": "^18",
     "react-simple-keyboard": "^3.7.101",
+    "react-toastify": "^10.0.5",
     "simple-keyboard": "^3.7.70"
   },
   "devDependencies": {
