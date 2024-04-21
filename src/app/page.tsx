@@ -213,7 +213,7 @@ export default function Home() {
   const generatePredictions = async (word: string, index: number) => {
     setPredictionsLoading(true)
     // console.log('Generating predictions');
-    const autoComplete = await fetch('/api/autoComplete', {
+    const autoComplete = await fetch('/api/autocomplete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
