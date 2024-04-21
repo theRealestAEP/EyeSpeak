@@ -19,6 +19,7 @@ export default function Home() {
   // Inside your component
   const scrollableDivRef = useRef<HTMLDivElement>(null);
   const [isScrollable, setIsScrollable] = useState(false);
+  
   const scrollAmount = 50;
 
   //store passed messages locally on device storage - and fetch like the most recent 5 messages and stick them here 
@@ -523,7 +524,7 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <div className="keyboard-wrapper">
+            <div>
               {rows.map((row, index) => (
                 <div key={index} className="flex justify-center gap-2 mb-2">
                   {row.map((key) => (

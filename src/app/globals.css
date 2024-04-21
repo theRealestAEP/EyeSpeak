@@ -59,15 +59,6 @@
   max-width: 100%;
   font-weight: bold;
 }
-.keyboard-wrapper {
-  /* display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin: 20px; */
-  left: 50%;
-  bottom: 0;
-}
-
 .kbd-button {
   background-color: #e9e8e8;
   color: black;
@@ -113,6 +104,23 @@
   }
 }
 
+@media screen and (max-width: 1180px) {
+  .kbd-space {
+    padding: 25px 180px;
+    font-size: 1rem; /* 16px */
+  }
+
+  .kbd-shift {
+    padding: 25px 50px;
+    font-size: 1rem; 
+  }
+
+  .kbd-default {
+    padding: 25px 40px;
+    font-size: 1rem; 
+  }
+}
+
 
 /* Increase max-width and font-size for larger screens */
 @media screen and (min-width: 768px) {
@@ -129,6 +137,14 @@
     max-width: 100%; /* Adjust as needed */
     font-size: 25px; /* Adjust as needed */
     height: 80px;
+  }
+}
+
+@media screen and (max-width: 1180px) {
+  .button {
+    max-width: 100%; /* Adjust as needed */
+    font-size: 18px; /* Adjust as needed */
+    height: 60px;
   }
 }
 
