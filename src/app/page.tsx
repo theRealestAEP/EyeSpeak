@@ -545,7 +545,7 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <div>
+            <div className="mt-10">
               {rows.map((row, index) => (
                 <div key={index} className="flex justify-center gap-2 mb-2">
                   {row.map((key) => (
