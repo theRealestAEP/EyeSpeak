@@ -16,11 +16,18 @@ export default function Home() {
   const [selectedWordIndex, setSelectedWordIndex] = useState(0);
   const [savedPhrasesOpen, setsavedPhrasesOpen] = useState(false)
 
-  // Inside your component
+  //this is for the currently typed sentence 
   const scrollableDivRef = useRef<HTMLDivElement>(null);
   const [isScrollable, setIsScrollable] = useState(false);
-  
   const scrollAmount = 50;
+
+
+  //this will be for phrases
+  const scrollablePhrasesDivRef = useRef<HTMLDivElement>(null);
+  const [isScrollablePhrases, setIsScrollablePhrases] = useState(false);
+
+  const [deleteSavedWordMode, setdeleteSavedWordMode] = useState(false)
+
 
   //store passed messages locally on device storage - and fetch like the most recent 5 messages and stick them here 
   // only store ones that have been generated into audio so trigger on generate audio
@@ -411,18 +418,32 @@ export default function Home() {
 
   }
 
+  // IF THERE ARE MORE THAN 15 - MAKE SCROLLABLE OR PREVENT USER FROM ADDING MORE 
+  // ADD DELETION FOR COMMON PHRASES 
+  const deleteSavedPhrase = (index: number) => {
+    let newCommonPhrases = [...commonPhrases];
+    newCommonPhrases.splice(index, 1);
+    setCommonPhrases(newCommonPhrases);
+    localStorage.setItem('commonPhrases', JSON.stringify(newCommonPhrases));
+  }
+
   //Need to add a function to save as a common phrase - common phrases will be stored in local storage and fetched on page load 
   const savePhrase = () => {
     //save the current input as a common phrase
     //add to local storage 
     //fetch the common phrases on page load
     // Assume `input` is the current input you want to save
-    if(input == ""){
+    let commonPhrases: string[] = localStorage.getItem('commonPhrases') ? JSON.parse(localStorage.getItem('commonPhrases')!) : [];
+    if (input == "") {
       toast("Please enter a phrase to save!");
       return;
     }
 
-    let commonPhrases: string[] = localStorage.getItem('commonPhrases') ? JSON.parse(localStorage.getItem('commonPhrases')!) : [];
+    if (commonPhrases.includes(input)) {
+      toast("phrase already saved!");
+      return;
+    }
+
     // Add the current input to the array
     commonPhrases.push(input);
     setCommonPhrases(commonPhrases);
@@ -555,13 +576,26 @@ export default function Home() {
                       <p>Nothing saved yet</p>
                     ) : (
                       commonPhrases.map((phrase, index) => (
-                        <div key={index} onClick={()=>{insertSavedPhrase(phrase); setsavedPhrasesOpen(!savedPhrasesOpen)}} className="card bg-blue-100 p-6 text-3xl rounded shadow text-bold">
+                        <div key={index} onClick={() => {
+                          if (deleteSavedWordMode == false) {
+                            insertSavedPhrase(phrase);
+                            setsavedPhrasesOpen(!savedPhrasesOpen)
+                          }
+                          else {
+                            deleteSavedPhrase(index)
+                          }
+                        }} className="card bg-blue-100 p-6 text-3xl rounded shadow text-bold">
                           <p>{phrase}</p>
                         </div>
                       ))
                     )}
                   </div>
-                  <button className="absolute top-0 right-0 bg-red-600 text-6xl rounded-md p-6 font-bold text-white" onClick={() => setsavedPhrasesOpen(!savedPhrasesOpen)}>Close</button>
+                  <button className="absolute top-0 right-0 bg-red-600 text-6xl rounded-md p-6 font-bold text-white" onClick={() => {setsavedPhrasesOpen(!savedPhrasesOpen); setdeleteSavedWordMode(false)}}>Close</button>
+                  {deleteSavedWordMode ? (
+                    <button className="absolute top-0 left-0 bg-red-600 text-6xl rounded-md p-6 font-bold text-white" onClick={() => setdeleteSavedWordMode(!deleteSavedWordMode)}>Stop Deleting</button>
+                  ) : (
+                    <button className="absolute top-0 left-0 bg-red-600 text-6xl rounded-md p-6 font-bold text-white" onClick={() => setdeleteSavedWordMode(!deleteSavedWordMode)}>Delete Mode</button>
+                  )}
                 </div>
               </div>
             )}
