@@ -23,7 +23,7 @@ const generatePredictions = async (sentence: string, word:string, index:number) 
     // console.log(index)
 
     const response = await openai.chat.completions.create({
-        model: 'gpt-4',
+        model: 'gpt-4o',
         messages: [
             { "role": "system", "content": `You are an advanced text message autocomplete tool designed to enhance sentence completion by providing word suggestions based on the typing context. Your operation will vary slightly depending on the position of the word in the sentence:
             1. When receiving a sentence, the current word under consideration, and its position in the sentence, you should:

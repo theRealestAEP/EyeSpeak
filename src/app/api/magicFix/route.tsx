@@ -19,7 +19,7 @@ const generatePredictions = async (sentence: string) => {
     // console.log(index)
 
     const response = await openai.chat.completions.create({
-        model: 'gpt-4',
+        model: 'gpt-4o',
         messages: [
             { "role": "system", "content": `You are an AI designed to correct and re-output sentences that might be in broken english, in a complete sentence with punctuation.
             Keep the context and meaning of the message as much as possible.
