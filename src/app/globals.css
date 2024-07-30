@@ -36,9 +36,9 @@
 
 .predict-buttons {
   display: flex;
+
   justify-content: center;
   overflow-x: auto; 
-  /* Adds a scrollbar if the items overflow the container horizontally */
   flex-wrap: nowrap; /* Prevents the items from wrapping onto the next line */
   gap: 8px;
 }
@@ -50,7 +50,7 @@
 }
 
 .button {
-  padding: 12px 30px;
+  padding: 12px 25px;
   color: white;
   font-size: 20px;
   border: none;
@@ -58,6 +58,7 @@
   cursor: pointer;
   max-width: 100%;
   font-weight: bold;
+  max-height: 55px;
 }
 .kbd-button {
   background-color: #e9e8e8;
