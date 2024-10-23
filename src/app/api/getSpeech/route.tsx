@@ -1,10 +1,10 @@
 const speakerID = 'wQHnBeDjtQUASXBO9akt'
-const gerenateAudio = async (text: string) => {
-    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${speakerID}?output_format=mp3_44100_96`, {
+const generateAudio = async (text: string, apiKey: string, speakerId: string) => {
+    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${speakerId}?output_format=mp3_44100_96`, {
         method: 'POST',
-        headers: new Headers({ //ignore this for now
+        headers: new Headers({
             'Content-Type': 'application/json',
-            'xi-api-key': process.env.ELEVENLABSKEY || ''
+            'xi-api-key': apiKey
         }),
         body: JSON.stringify({
             "voice_settings": {
@@ -19,23 +19,19 @@ const gerenateAudio = async (text: string) => {
     })
     let data = await response.arrayBuffer()
     return data
-
 }
-
 
 export async function POST(req: Request) {
   if (req.method === 'POST') {
-    // Handle POST request
     const data = await req.json();
     console.log(data);
 
-    // Do something with 'text'...
-    console.log(data.text);
-    // let text = data.text
+    const { text, apiKey, speakerId } = data;
+    console.log(text);
 
-    let audioBuffer = await gerenateAudio(data.text)
+    let audioBuffer = await generateAudio(text, apiKey, speakerId)
     console.log(audioBuffer)
-    // Return a response object
+
     return new Response(JSON.stringify({audioBuf: Buffer.from(audioBuffer).toString('base64')}), {
         status: 200,
         headers: {

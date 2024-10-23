@@ -144,22 +144,38 @@ export default function Home() {
   const generateAudio = async () => {
     setAudioLoading(true)
     console.log('Generating audio');
+
+    // Get the API key and speaker ID from URL query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const apiKey = urlParams.get('elevenkey');
+    const speakerId = urlParams.get('elevenid');
+
+    if (!apiKey || !speakerId) {
+      setAudioLoading(false);
+      console.error('API key or speaker ID not provided in URL parameters');
+      toast.error('API key or speaker ID not provided');
+      return;
+    }
+
     const response = await fetch('/api/getSpeech', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text: input }),
+      body: JSON.stringify({ 
+        text: input,
+        apiKey: apiKey,
+        speakerId: speakerId
+      }),
     });
 
     if (!response.ok) {
       setAudioLoading(false)
-      //throw an error here 
       console.error('HTTP error', response.status);
+      toast.error('Failed to generate audio');
     } else {
       const data = await response.json();
       setAudioLoading(false)
-      // console.log(data);
       const audioBufBase64 = data.audioBuf;
       const audioBuf = Buffer.from(audioBufBase64, 'base64');
       const audioBlob = new Blob([audioBuf], { type: 'audio/mp3' });
@@ -168,6 +184,7 @@ export default function Home() {
       const audio = new Audio(audioURL);
       setAudioElement(audio);
       addMessageToPastMessages(input);
+      toast.success('Audio generated successfully');
     }
   };
 
@@ -221,13 +238,13 @@ export default function Home() {
   const generatePredictions = async (word: string, index: number) => {
     setPredictionsLoading(true)
     // console.log('Generating predictions');
-    const autoComplete = await fetch('/api/autocomplete', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ text: input, word: word, index: index }),
-    });
+    // const autoComplete = await fetch('/api/autocomplete', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({ text: input, word: word, index: index }),
+    // });
 
     const response = await fetch('/api/promptGPT', {
       method: 'POST',
@@ -237,23 +254,24 @@ export default function Home() {
       body: JSON.stringify({ text: input, word: word, index: index }),
     });
 
-    if (!response.ok || !autoComplete.ok) {
+    if (!response.ok) {
       setAudioLoading(false)
       //throw an error here 
       console.error('HTTP error', response.status);
     } else {
       const data = await response.json();
-      const autoCompleteData = await autoComplete.json();
+      // const autoCompleteData = await autoComplete.json();
 
       setPredictionsLoading(false)
       // console.log(data);
       //remove all commas and periods from the predictions
       // console.log(data.predictionsArray)
       data.predictionsArray = data.predictionsArray.map((word: string) => word.replaceAll(',', ''))
-      autoCompleteData.predictionsArray = autoCompleteData.predictionsArray.map((word: string) => word.replaceAll(',', ''))
+      // autoCompleteData.predictionsArray = autoCompleteData.predictionsArray.map((word: string) => word.replaceAll(',', ''))
 
-      let combinedArray = data.predictionsArray.slice(0, 4).concat(autoCompleteData.predictionsArray.slice(0, 4));
-      combinedArray = combinedArray.filter((value: any, index: any, self: any) => self.indexOf(value) === index);
+      let combinedArray = data.predictionsArray.slice(0, 5)
+      // .concat(autoCompleteData.predictionsArray.slice(0, 4));
+      // let combinedArray = combinedArray.filter((value: any, index: any, self: any) => self.indexOf(value) === index);
       setPredictedWords(combinedArray)
       // setAudioLoading(false)
       // set the predictions herea
