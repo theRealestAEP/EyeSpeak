@@ -29,15 +29,31 @@ export async function POST(req: Request) {
     const { text, apiKey, speakerId } = data;
     console.log(text);
 
-    let audioBuffer = await generateAudio(text, apiKey, speakerId)
-    console.log(audioBuffer)
+    try {
+      let audioBuffer = await generateAudio(text, apiKey, speakerId)
+      console.log("Audio buffer size:", audioBuffer.byteLength);
 
-    return new Response(JSON.stringify({audioBuf: Buffer.from(audioBuffer).toString('base64')}), {
+      // Convert ArrayBuffer to Base64
+      const base64Audio = Buffer.from(audioBuffer).toString('base64');
+
+
+      // console.log(base64Audio)
+
+      return new Response(JSON.stringify({audioBuf: base64Audio}), {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
         },
       });
+    } catch (error) {
+      console.error("Error generating audio:", error);
+      return new Response(JSON.stringify({ error: "Failed to generate audio" }), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    }
   } else {
     // Handle other HTTP methods or return an error
     return new Response(JSON.stringify({ message: 'Method Not Allowed' }), {

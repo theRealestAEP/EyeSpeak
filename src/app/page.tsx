@@ -142,10 +142,9 @@ export default function Home() {
 
 
   const generateAudio = async () => {
-    setAudioLoading(true)
+    setAudioLoading(true);
     console.log('Generating audio');
 
-    // Get the API key and speaker ID from URL query parameters
     const urlParams = new URLSearchParams(window.location.search);
     const apiKey = urlParams.get('elevenkey');
     const speakerId = urlParams.get('elevenid');
@@ -157,42 +156,77 @@ export default function Home() {
       return;
     }
 
-    const response = await fetch('/api/getSpeech', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        text: input,
-        apiKey: apiKey,
-        speakerId: speakerId
-      }),
-    });
+    try {
+      const response = await fetch('/api/getSpeech', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          text: input,
+          apiKey: apiKey,
+          speakerId: speakerId
+        }),
+      });
 
-    if (!response.ok) {
-      setAudioLoading(false)
-      console.error('HTTP error', response.status);
-      toast.error('Failed to generate audio');
-    } else {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
-      setAudioLoading(false)
+      console.log('Received data:', data);
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (!data.audioBuf) {
+        throw new Error('No audio data received from the server');
+      }
+
       const audioBufBase64 = data.audioBuf;
+      // console.log(audioBufBase64)
       const audioBuf = Buffer.from(audioBufBase64, 'base64');
+
       const audioBlob = new Blob([audioBuf], { type: 'audio/mp3' });
       setAudioSpeechBlob(audioBlob);
       const audioURL = URL.createObjectURL(audioBlob);
+
       const audio = new Audio(audioURL);
+      audio.onerror = (e) => {
+        // console.error('Audio error:', e);
+        // console.error('Audio error code:', audio.error?.code);
+        // console.error('Audio error message:', audio.error?.message);
+        toast.error('Error loading audio');
+      };
       setAudioElement(audio);
+
+      await audio.load();
+      console.log('Audio loaded successfully');
+
       addMessageToPastMessages(input);
       toast.success('Audio generated successfully');
+    } catch (error) {
+      console.error('Error generating audio:', error);
+      toast.error(`Failed to generate audio: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setAudioLoading(false);
     }
   };
 
   const playAudio = () => {
     if (audioElement !== null) {
-      audioElement.play();
+      console.log('Audio element:', audioElement);
+      console.log('Audio source:', audioElement.src);
+      console.log('Audio ready state:', audioElement.readyState);
+      audioElement.play().catch(error => {
+        console.error('Error playing audio:', error);
+        toast.error('Failed to play audio');
+      });
+    } else {
+      console.error('No audio element available');
+      toast.error('No audio to play');
     }
-
   }
 
   const pauseAudio = () => {
