@@ -271,21 +271,23 @@ export default function Home() {
 
   const generatePredictions = async (word: string, index: number) => {
     setPredictionsLoading(true)
-    // console.log('Generating predictions');
-    // const autoComplete = await fetch('/api/autocomplete', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ text: input, word: word, index: index }),
-    // });
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const openaiKey = urlParams.get('openaikey');
+
+    if (!openaiKey) {
+      setPredictionsLoading(false);
+      console.error('OpenAI API key not provided in URL parameters');
+      toast.error('OpenAI API key not provided');
+      return;
+    }
 
     const response = await fetch('/api/promptGPT', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text: input, word: word, index: index }),
+      body: JSON.stringify({ text: input, word: word, index: index, openaiKey: openaiKey }),
     });
 
     if (!response.ok) {
@@ -376,13 +378,21 @@ export default function Home() {
   };
 
   const magicFix = async () => {
-    // console.log('Generating predictions');
+    const urlParams = new URLSearchParams(window.location.search);
+    const openaiKey = urlParams.get('openaikey');
+
+    if (!openaiKey) {
+      console.error('OpenAI API key not provided in URL parameters');
+      toast.error('OpenAI API key not provided');
+      return;
+    }
+
     const response = await fetch('/api/magicFix', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text: input }),
+      body: JSON.stringify({ text: input, openaiKey: openaiKey }),
     });
 
     if (!response.ok) {
@@ -659,4 +669,3 @@ export default function Home() {
 
   );
 }
-

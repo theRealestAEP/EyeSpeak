@@ -1,11 +1,10 @@
 import OpenAI from 'openai'
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAIKEY,
-});
 
 
-const generatePredictions = async (sentence: string, word:string, index:number) => {
+const generatePredictions = async (sentence: string, word:string, apiKey: string) => {
+  const openai = new OpenAI({ apiKey });
+
     // console.log('translating');
     // console.log(typeof(sentence))
     // console.log(typeof(word))
