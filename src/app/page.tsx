@@ -36,6 +36,8 @@ export default function Home() {
 
   // const commonPhrases = ["Thank you! ", "Can you come over here really, quickly? ", "Hey how are you doing today? ", "Yes!", "No."]
   const [commonPhrases, setCommonPhrases] = useState<string[]>([]);
+  const [speechSpeed, setSpeechSpeed] = useState(1.0); // Add state for speed
+  const [settingsOpen, setSettingsOpen] = useState(false); // Add state for settings modal
 
   useEffect(() => {
     const storedPhrases = localStorage.getItem('commonPhrases');
@@ -162,10 +164,11 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           text: input,
           apiKey: apiKey,
-          speakerId: speakerId
+          speakerId: speakerId,
+          speed: speechSpeed // Pass the speed state here
         }),
       });
 
@@ -278,7 +281,7 @@ export default function Home() {
     if (!openaiKey) {
       setPredictionsLoading(false);
       console.error('OpenAI API key not provided in URL parameters');
-      toast.error('OpenAI API key not provided');
+      // toast.error('OpenAI API key not provided');
       return;
     }
 
@@ -516,6 +519,15 @@ export default function Home() {
     localStorage.setItem('commonPhrases', JSON.stringify(commonPhrases));
   }
 
+  const handleSpeedChange = (increment: boolean) => {
+    setSpeechSpeed(prevSpeed => {
+      let newSpeed = increment ? prevSpeed + 0.05 : prevSpeed - 0.05;
+      // Clamp the value between 0.8 and 1.2 and round to avoid floating point issues
+      newSpeed = Math.max(0.8, Math.min(1.2, parseFloat(newSpeed.toFixed(2))));
+      return newSpeed;
+    });
+  };
+
   return (
     <main>
       {/* Left Section: Text input, buttons, and keyboard */}
@@ -606,21 +618,23 @@ export default function Home() {
               }
             </div>
           </div>
-          <div>
+          <div className="keyboard-container">
             <div>
-              {rows.map((row, index) => (
-                <div key={index} className="flex justify-center gap-2 mb-2">
-                  {row.map((key) => (
-                    <button
-                      key={key}
-                      onClick={() => keyboardPress(key)}
-                      className={getButtonClass(key)}
-                    >
-                      {key.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-              ))}
+              <div>
+                {rows.map((row, index) => (
+                  <div key={index} className="flex justify-center gap-2 mb-2">
+                    {row.map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => keyboardPress(key)}
+                        className={getButtonClass(key)}
+                      >
+                        {key.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           <div >
@@ -631,7 +645,7 @@ export default function Home() {
             {savedPhrasesOpen && (
               <div className="fixed inset-0 bg-gray-500 bg-opacity-50 z-10 flex items-center justify-center overflow-y-auto">
 
-                <div className="bg-white p-6 rounded shadow-lg">
+                <div className="bg-white p-6 rounded shadow-lg relative min-w-[50vw] min-h-[50vh]">
                   {/* Modal content goes here */}
                   <div className="grid grid-cols-3 gap-4">
                     {commonPhrases.length === 0 ? (
@@ -646,22 +660,61 @@ export default function Home() {
                           else {
                             deleteSavedPhrase(index)
                           }
-                        }} className="card bg-blue-100 p-6 text-3xl rounded shadow text-bold">
+                        }} className="card bg-blue-100 p-6 text-3xl rounded shadow text-bold cursor-pointer hover:bg-blue-200">
                           <p>{phrase}</p>
                         </div>
                       ))
                     )}
                   </div>
-                  <button className="absolute top-0 right-0 bg-red-600 text-6xl rounded-md p-6 font-bold text-white" onClick={() => {setsavedPhrasesOpen(!savedPhrasesOpen); setdeleteSavedWordMode(false)}}>Close</button>
+                  <button className="absolute top-4 right-4 bg-red-600 text-4xl rounded-md p-4 font-bold text-white" onClick={() => {setsavedPhrasesOpen(!savedPhrasesOpen); setdeleteSavedWordMode(false)}}>Close</button>
                   {deleteSavedWordMode ? (
-                    <button className="absolute top-0 left-0 bg-red-600 text-6xl rounded-md p-6 font-bold text-white" onClick={() => setdeleteSavedWordMode(!deleteSavedWordMode)}>Stop Deleting</button>
+                    <button className="absolute top-4 left-4 bg-red-600 text-4xl rounded-md p-4 font-bold text-white" onClick={() => setdeleteSavedWordMode(!deleteSavedWordMode)}>Stop Deleting</button>
                   ) : (
-                    <button className="absolute top-0 left-0 bg-red-600 text-6xl rounded-md p-6 font-bold text-white" onClick={() => setdeleteSavedWordMode(!deleteSavedWordMode)}>Delete Mode</button>
+                    <button className="absolute top-4 left-4 bg-red-600 text-4xl rounded-md p-4 font-bold text-white" onClick={() => setdeleteSavedWordMode(!deleteSavedWordMode)}>Delete Mode</button>
                   )}
                 </div>
               </div>
             )}
           </div>
+          <div>
+             <button
+               className="absolute bottom-4 left-4 bg-gray-600 text-3xl rounded-md p-5 font-bold text-white"
+               onClick={() => setSettingsOpen(true)}
+             >
+               ⚙️ {/* Gear Icon */}
+             </button>
+          </div>
+          {settingsOpen && (
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 z-20 flex items-center justify-center">
+              <div className="bg-white p-8 rounded shadow-lg relative w-1/3">
+                <h2 className="text-4xl font-bold mb-6 text-center">Settings</h2>
+                <div className="flex items-center justify-center space-x-4 mb-6">
+                  <span className="text-2xl font-medium">Speech Speed:</span>
+                  <button
+                    onClick={() => handleSpeedChange(false)}
+                    disabled={speechSpeed <= 0.8}
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-3xl disabled:opacity-50"
+                  >
+                    -
+                  </button>
+                  <span className="text-3xl font-bold w-16 text-center">{speechSpeed.toFixed(2)}</span>
+                  <button
+                    onClick={() => handleSpeedChange(true)}
+                    disabled={speechSpeed >= 1.2}
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-3xl disabled:opacity-50"
+                  >
+                    +
+                  </button>
+                </div>
+                <button
+                  className="absolute top-4 right-4 bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded text-2xl"
+                  onClick={() => setSettingsOpen(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
         </div>
         <ToastContainer />
       </div>
