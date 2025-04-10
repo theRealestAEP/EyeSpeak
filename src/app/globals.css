@@ -377,3 +377,11 @@
   min-width: 80px;
   max-width: 80px;
 }
+
+/* --- Hide Custom Keyboard on Smaller Screens --- */
+@media (max-width: 1023px) { /* Adjust breakpoint as needed */
+  .keyboard-container {
+    display: none;
+  }
+}
+/* --------------------------------------------- */

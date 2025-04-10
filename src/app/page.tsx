@@ -36,6 +36,8 @@ export default function Home() {
 
   // const commonPhrases = ["Thank you! ", "Can you come over here really, quickly? ", "Hey how are you doing today? ", "Yes!", "No."]
   const [commonPhrases, setCommonPhrases] = useState<string[]>([]);
+  const [speechSpeed, setSpeechSpeed] = useState(1.0); // Add state for speed
+  const [settingsOpen, setSettingsOpen] = useState(false); // Add state for settings modal
 
   useEffect(() => {
     const storedPhrases = localStorage.getItem('commonPhrases');
@@ -142,10 +144,9 @@ export default function Home() {
 
 
   const generateAudio = async () => {
-    setAudioLoading(true)
+    setAudioLoading(true);
     console.log('Generating audio');
 
-    // Get the API key and speaker ID from URL query parameters
     const urlParams = new URLSearchParams(window.location.search);
     const apiKey = urlParams.get('elevenkey');
     const speakerId = urlParams.get('elevenid');
@@ -157,42 +158,78 @@ export default function Home() {
       return;
     }
 
-    const response = await fetch('/api/getSpeech', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        text: input,
-        apiKey: apiKey,
-        speakerId: speakerId
-      }),
-    });
+    try {
+      const response = await fetch('/api/getSpeech', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: input,
+          apiKey: apiKey,
+          speakerId: speakerId,
+          speed: speechSpeed // Pass the speed state here
+        }),
+      });
 
-    if (!response.ok) {
-      setAudioLoading(false)
-      console.error('HTTP error', response.status);
-      toast.error('Failed to generate audio');
-    } else {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
-      setAudioLoading(false)
+      console.log('Received data:', data);
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (!data.audioBuf) {
+        throw new Error('No audio data received from the server');
+      }
+
       const audioBufBase64 = data.audioBuf;
+      // console.log(audioBufBase64)
       const audioBuf = Buffer.from(audioBufBase64, 'base64');
+
       const audioBlob = new Blob([audioBuf], { type: 'audio/mp3' });
       setAudioSpeechBlob(audioBlob);
       const audioURL = URL.createObjectURL(audioBlob);
+
       const audio = new Audio(audioURL);
+      audio.onerror = (e) => {
+        // console.error('Audio error:', e);
+        // console.error('Audio error code:', audio.error?.code);
+        // console.error('Audio error message:', audio.error?.message);
+        toast.error('Error loading audio');
+      };
       setAudioElement(audio);
+
+      await audio.load();
+      console.log('Audio loaded successfully');
+
       addMessageToPastMessages(input);
       toast.success('Audio generated successfully');
+    } catch (error) {
+      console.error('Error generating audio:', error);
+      toast.error(`Failed to generate audio: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setAudioLoading(false);
     }
   };
 
   const playAudio = () => {
     if (audioElement !== null) {
-      audioElement.play();
+      console.log('Audio element:', audioElement);
+      console.log('Audio source:', audioElement.src);
+      console.log('Audio ready state:', audioElement.readyState);
+      audioElement.play().catch(error => {
+        console.error('Error playing audio:', error);
+        toast.error('Failed to play audio');
+      });
+    } else {
+      console.error('No audio element available');
+      toast.error('No audio to play');
     }
-
   }
 
   const pauseAudio = () => {
@@ -237,21 +274,23 @@ export default function Home() {
 
   const generatePredictions = async (word: string, index: number) => {
     setPredictionsLoading(true)
-    // console.log('Generating predictions');
-    // const autoComplete = await fetch('/api/autocomplete', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ text: input, word: word, index: index }),
-    // });
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const openaiKey = urlParams.get('openaikey');
+
+    if (!openaiKey) {
+      setPredictionsLoading(false);
+      console.error('OpenAI API key not provided in URL parameters');
+      // toast.error('OpenAI API key not provided');
+      return;
+    }
 
     const response = await fetch('/api/promptGPT', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text: input, word: word, index: index }),
+      body: JSON.stringify({ text: input, word: word, index: index, openaiKey: openaiKey }),
     });
 
     if (!response.ok) {
@@ -342,13 +381,21 @@ export default function Home() {
   };
 
   const magicFix = async () => {
-    // console.log('Generating predictions');
+    const urlParams = new URLSearchParams(window.location.search);
+    const openaiKey = urlParams.get('openaikey');
+
+    if (!openaiKey) {
+      console.error('OpenAI API key not provided in URL parameters');
+      toast.error('OpenAI API key not provided');
+      return;
+    }
+
     const response = await fetch('/api/magicFix', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text: input }),
+      body: JSON.stringify({ text: input, openaiKey: openaiKey }),
     });
 
     if (!response.ok) {
@@ -472,6 +519,15 @@ export default function Home() {
     localStorage.setItem('commonPhrases', JSON.stringify(commonPhrases));
   }
 
+  const handleSpeedChange = (increment: boolean) => {
+    setSpeechSpeed(prevSpeed => {
+      let newSpeed = increment ? prevSpeed + 0.05 : prevSpeed - 0.05;
+      // Clamp the value between 0.8 and 1.2 and round to avoid floating point issues
+      newSpeed = Math.max(0.8, Math.min(1.2, parseFloat(newSpeed.toFixed(2))));
+      return newSpeed;
+    });
+  };
+
   return (
     <main>
       {/* Left Section: Text input, buttons, and keyboard */}
@@ -562,21 +618,23 @@ export default function Home() {
               }
             </div>
           </div>
-          <div>
+          <div className="keyboard-container">
             <div>
-              {rows.map((row, index) => (
-                <div key={index} className="flex justify-center gap-2 mb-2">
-                  {row.map((key) => (
-                    <button
-                      key={key}
-                      onClick={() => keyboardPress(key)}
-                      className={getButtonClass(key)}
-                    >
-                      {key.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-              ))}
+              <div>
+                {rows.map((row, index) => (
+                  <div key={index} className="flex justify-center gap-2 mb-2">
+                    {row.map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => keyboardPress(key)}
+                        className={getButtonClass(key)}
+                      >
+                        {key.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           <div >
@@ -587,7 +645,7 @@ export default function Home() {
             {savedPhrasesOpen && (
               <div className="fixed inset-0 bg-gray-500 bg-opacity-50 z-10 flex items-center justify-center overflow-y-auto">
 
-                <div className="bg-white p-6 rounded shadow-lg">
+                <div className="bg-white p-6 rounded shadow-lg relative min-w-[50vw] min-h-[50vh]">
                   {/* Modal content goes here */}
                   <div className="grid grid-cols-3 gap-4">
                     {commonPhrases.length === 0 ? (
@@ -602,22 +660,61 @@ export default function Home() {
                           else {
                             deleteSavedPhrase(index)
                           }
-                        }} className="card bg-blue-100 p-6 text-3xl rounded shadow text-bold">
+                        }} className="card bg-blue-100 p-6 text-3xl rounded shadow text-bold cursor-pointer hover:bg-blue-200">
                           <p>{phrase}</p>
                         </div>
                       ))
                     )}
                   </div>
-                  <button className="absolute top-0 right-0 bg-red-600 text-6xl rounded-md p-6 font-bold text-white" onClick={() => {setsavedPhrasesOpen(!savedPhrasesOpen); setdeleteSavedWordMode(false)}}>Close</button>
+                  <button className="absolute top-4 right-4 bg-red-600 text-4xl rounded-md p-4 font-bold text-white" onClick={() => {setsavedPhrasesOpen(!savedPhrasesOpen); setdeleteSavedWordMode(false)}}>Close</button>
                   {deleteSavedWordMode ? (
-                    <button className="absolute top-0 left-0 bg-red-600 text-6xl rounded-md p-6 font-bold text-white" onClick={() => setdeleteSavedWordMode(!deleteSavedWordMode)}>Stop Deleting</button>
+                    <button className="absolute top-4 left-4 bg-red-600 text-4xl rounded-md p-4 font-bold text-white" onClick={() => setdeleteSavedWordMode(!deleteSavedWordMode)}>Stop Deleting</button>
                   ) : (
-                    <button className="absolute top-0 left-0 bg-red-600 text-6xl rounded-md p-6 font-bold text-white" onClick={() => setdeleteSavedWordMode(!deleteSavedWordMode)}>Delete Mode</button>
+                    <button className="absolute top-4 left-4 bg-red-600 text-4xl rounded-md p-4 font-bold text-white" onClick={() => setdeleteSavedWordMode(!deleteSavedWordMode)}>Delete Mode</button>
                   )}
                 </div>
               </div>
             )}
           </div>
+          <div>
+             <button
+               className="absolute bottom-4 left-4 bg-gray-600 text-3xl rounded-md p-5 font-bold text-white"
+               onClick={() => setSettingsOpen(true)}
+             >
+               ⚙️ {/* Gear Icon */}
+             </button>
+          </div>
+          {settingsOpen && (
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 z-20 flex items-center justify-center">
+              <div className="bg-white p-8 rounded shadow-lg relative w-1/3">
+                <h2 className="text-4xl font-bold mb-6 text-center">Settings</h2>
+                <div className="flex items-center justify-center space-x-4 mb-6">
+                  <span className="text-2xl font-medium">Speech Speed:</span>
+                  <button
+                    onClick={() => handleSpeedChange(false)}
+                    disabled={speechSpeed <= 0.8}
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-3xl disabled:opacity-50"
+                  >
+                    -
+                  </button>
+                  <span className="text-3xl font-bold w-16 text-center">{speechSpeed.toFixed(2)}</span>
+                  <button
+                    onClick={() => handleSpeedChange(true)}
+                    disabled={speechSpeed >= 1.2}
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-3xl disabled:opacity-50"
+                  >
+                    +
+                  </button>
+                </div>
+                <button
+                  className="absolute top-4 right-4 bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded text-2xl"
+                  onClick={() => setSettingsOpen(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
         </div>
         <ToastContainer />
       </div>
@@ -625,4 +722,3 @@ export default function Home() {
 
   );
 }
-

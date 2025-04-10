@@ -1,11 +1,8 @@
 import OpenAI from 'openai'
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAIKEY,
-});
+const generatePredictions = async (sentence: string, apiKey: string) => {
+    const openai = new OpenAI({ apiKey });
 
-
-const generatePredictions = async (sentence: string) => {
     // console.log('translating');
     // console.log(typeof(sentence))
     // console.log(typeof(word))
@@ -35,20 +32,17 @@ const generatePredictions = async (sentence: string) => {
 
 export async function POST(req: Request) {
   if (req.method === 'POST') {
-    // Handle POST request
     const data = await req.json();
-    console.log(data);
+    const { text, openaiKey } = data;
 
-    // Do something with 'text'...
-    console.log(data.text);
-    let text = data.text
-    if(typeof(text) == 'undefined'){
-        text = ''
+    if (!openaiKey) {
+      return new Response(JSON.stringify({ error: 'OpenAI API key not provided' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
-    console.log(text)
-
-    let predictions = await generatePredictions(text)
+    let predictions = await generatePredictions(text || '', openaiKey);
 
     let magicArray = predictions!.split(' ') // split the predictions into an array of words
 
